@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkMINS V1 - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        :root {
+            --primary: #0a0a12;
+            --secondary: #1a1a2e;
+            --accent: #6a11cb;
+            --accent-light: #2575fc;
+            --text: #e0e0e0;
+            --text-dim: #a0a0a0;
+            --danger: #ff416c;
+            --success: #24cca7;
+            --warning: #ffd166;
+            --owner: #6a11cb;
+            --dev: #2575fc;
+            --reseller: #00d2ff;
+            --user: #24cca7;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(106, 17, 203, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(37, 117, 252, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: rgba(10, 10, 18, 0.85);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            background: linear-gradient(to right, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        
+        .logo span {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            letter-spacing: 3px;
+        }
+        
+        .menu {
+            list-style: none;
+            flex-grow: 1;
+        }
+        
+        .menu-item {
+            margin-bottom: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .menu-item.active {
+            background: linear-gradient(90deg, rgba(106, 17, 203, 0.3), rgba(37, 117, 252, 0.2));
+            border-left: 3px solid var(--accent);
+        }
+        
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .menu-link i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .menu-item.active .menu-link {
+            color: white;
+        }
+        
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: rgba(255, 65, 108, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(255, 65, 108, 0.3);
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 65, 108, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .logout-btn i {
+            margin-right: 10px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-right: 15px;
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .user-details h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+        
+        .user-details .role {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .role-owner { background: rgba(106, 17, 203, 0.2); color: var(--owner); }
+        .role-dev { background: rgba(37, 117, 252, 0.2); color: var(--dev); }
+        .role-reseller { background: rgba(0, 210, 255, 0.2); color: var(--reseller); }
+        .role-user { background: rgba(36, 204, 167, 0.2); color: var(--user); }
+        
+        .time-display {
+            text-align: right;
+        }
+        
+        .time-display .time {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+            white-space: nowrap;
+        }
+        
+        .time-display .date {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        
+        .page-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .page-title i {
+            margin-right: 15px;
+            color: var(--accent);
+        }
+        
+        .card {
+            background: rgba(15, 15, 25, 0.7);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--accent-light);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .info-label {
+            width: 150px;
+            color: var(--text-dim);
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+        
+        .info-value {
+            flex: 1;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .hidden-value {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: inline-block;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
+        }
+        
+        .validity-timer {
+            text-align: center;
+            padding: 20px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(106, 17, 203, 0.2), rgba(37, 117, 252, 0.2));
+            margin-top: 20px;
+            border: 1px solid rgba(106, 17, 203, 0.3);
+        }
+        
+        .validity-timer h3 {
+            color: var(--accent-light);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--success);
+            text-shadow: 0 0 10px rgba(36, 204, 167, 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .tool-card {
+            background: rgba(20, 20, 35, 0.7);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+        
+        .tool-card:hover {
+            background: rgba(30, 30, 45, 0.8);
+            transform: translateY(-5px);
+            border-color: rgba(106, 17, 203, 0.3);
+        }
+        
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+        }
+        
+        .tool-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .tool-card p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-dim);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 30px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .accounts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed;
+        }
+        
+        .accounts-table th {
+            text-align: left;
+            padding: 15px;
+            background: rgba(106, 17, 203, 0.2);
+            color: var(--accent-light);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .accounts-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .accounts-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .role-owner-badge { background: rgba(106, 17, 203, 0.2); color: var(--owner); }
+        .role-dev-badge { background: rgba(37, 117, 252, 0.2); color: var(--dev); }
+        .role-reseller-badge { background: rgba(0, 210, 255, 0.2); color: var(--reseller); }
+        .role-user-badge { background: rgba(36, 204, 167, 0.2); color: var(--user); }
+        .role-expired-badge { background: rgba(255, 65, 108, 0.2); color: var(--danger); }
+        
+        .expired-text {
+            color: var(--danger);
+            font-weight: 600;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .role-info {
+            background: rgba(20, 20, 35, 0.7);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .role-info h4 {
+            color: var(--accent-light);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .role-info ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .role-info li {
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            position: relative;
+        }
+        
+        .role-info li:before {
+            content: '•';
+            color: var(--accent);
+            position: absolute;
+            left: -15px;
+        }
+        
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-box {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(15, 15, 25, 0.85);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .login-logo {
+            margin-bottom: 30px;
+        }
+        
+        .login-logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        
+        .login-logo span {
+            font-size: 1rem;
+            color: var(--text-dim);
+            letter-spacing: 4px;
+        }
+        
+        .login-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: var(--text);
+        }
+        
+        .login-footer {
+            margin-top: 30px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+        
+        .glow {
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px rgba(106, 17, 203, 0.5);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(106, 17, 203, 0.8), 0 0 30px rgba(37, 117, 252, 0.6);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 220px;
+            }
+            
+            .tools-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 20px;
+                flex-direction: row;
+                overflow-x: auto;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .logo {
+                margin-bottom: 0;
+                margin-right: 30px;
+                padding-bottom: 0;
+                border-bottom: none;
+                border-right: 1px solid rgba(255, 255, 255, 0.1);
+                padding-right: 30px;
+                min-width: 200px;
+            }
+            
+            .menu {
+                display: flex;
+                flex-grow: 0;
+            }
+            
+            .menu-item {
+                margin-bottom: 0;
+                margin-right: 10px;
+            }
+            
+            .menu-link span {
+                display: none;
+            }
+            
+            .menu-link i {
+                margin-right: 0;
+            }
+            
+            .logout-btn {
+                margin-top: 0;
+                margin-left: auto;
+                min-width: 50px;
+                justify-content: center;
+            }
+            
+            .logout-btn span {
+                display: none;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-info {
+                margin-bottom: 20px;
+            }
+            
+            .time-display {
+                text-align: left;
+            }
+            
+            .info-row {
+                flex-direction: column;
+            }
+            
+            .info-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .accounts-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .login-box {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="login-logo">
+                <h1>DARKMINS</h1>
+                <span>VERSION 1.0</span>
+            </div>
+            <h2 class="login-title">PLEASE LOGIN</h2>
+            
+            <div class="form-group">
+                <input type="text" id="loginUsername" class="form-control" placeholder="Username">
+            </div>
+            
+            <div class="form-group">
+                <input type="password" id="loginPassword" class="form-control" placeholder="Password">
+            </div>
+            
+            <button id="loginBtn" class="btn btn-block">
+                <i class="fas fa-sign-in-alt"></i> LOGIN
+            </button>
+            
+            <div class="login-footer">
+                <p>CONNECT WITH US</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="container hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>DARKMINS</h1>
+                <span>VERSION 1.0</span>
+            </div>
+            
+            <ul class="menu">
+                <li class="menu-item active" data-page="dashboardPage">
+                    <a href="#" class="menu-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-page="myInfoPage">
+                    <a href="#" class="menu-link">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Information</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-page="attackPage">
+                    <a href="#" class="menu-link">
+                        <i class="fas fa-crosshairs"></i>
+                        <span>Attack Page</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-page="createAccPage">
+                    <a href="#" class="menu-link" id="createAccMenu">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Create Account</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-page="toolsPage">
+                    <a href="#" class="menu-link">
+                        <i class="fas fa-tools"></i>
+                        <span>Tools Menu</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-page="thanksPage">
+                    <a href="#" class="menu-link">
+                        <i class="fas fa-heart"></i>
+                        <span>Thanks To</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <a href="#" id="logoutBtn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>LOGOUT</span>
+            </a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">B</div>
+                    <div class="user-details">
+                        <h2 id="usernameDisplay">BIMA01</h2>
+                        <div class="role role-owner" id="userRoleBadge">OWNER</div>
+                    </div>
+                </div>
+                
+                <div class="time-display">
+                    <div class="time" id="currentTime">00:00:00</div>
+                    <div class="date" id="currentDate">Loading...</div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Page -->
+            <div id="dashboardPage" class="page-content">
+                <h1 class="page-title"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-user-secret"></i> DarkMINS V1</h2>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Username:</div>
+                        <div class="info-value" id="dashboardUsername">BIMA01</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Password:</div>
+                        <div class="info-value">
+                            <span class="hidden-value" id="dashboardPassword">●●●●●●●●●●</span>
+                            <button id="showPassword" class="btn btn-small" style="margin-left: 15px;">
+                                <i class="fas fa-eye"></i> Show
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Role:</div>
+                        <div class="info-value">
+                            <span class="role-badge role-owner-badge" id="dashboardRole">OWNER</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Expired:</div>
+                        <div class="info-value" id="dashboardExpired">2026-03-12T13:09:44.028Z</div>
+                    </div>
+                    
+                    <div class="validity-timer">
+                        <h3><i class="fas fa-clock"></i> ACCOUNT VALIDITY</h3>
+                        <div class="timer" id="validityTimer">365d 23h 59m 59s</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-microchip"></i> System Status</h2>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Session ID:</div>
+                        <div class="info-value">xiv3lx9a8b7c6d</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">User Role:</div>
+                        <div class="info-value" id="systemRole">OWNER - Full Access</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Version:</div>
+                        <div class="info-value">DarkMINS V1.0</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Status:</div>
+                        <div class="info-value">
+                            <span style="color: var(--success);">
+                                <i class="fas fa-circle"></i> Active
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- My Information Page -->
+            <div id="myInfoPage" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-user-circle"></i> My Information</h1>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-id-card"></i> User Details</h2>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Username:</div>
+                        <div class="info-value" id="infoUsername">BIMA01</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Display Name:</div>
+                        <div class="info-value">BIMA</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Role:</div>
+                        <div class="info-value">
+                            <span class="role-badge role-owner-badge" id="infoRole">OWNER</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Account Created:</div>
+                        <div class="info-value">2025-03-12T13:09:44.028Z</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Expiration:</div>
+                        <div class="info-value" id="infoExpiration">2026-03-12T13:09:44.028Z</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-key"></i> Security</h2>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Password:</div>
+                        <div class="info-value">
+                            <span class="hidden-value">●●●●●●●●●●</span>
+                            <span style="margin-left: 15px; color: var(--text-dim); font-size: 0.9rem;">
+                                <i class="fas fa-info-circle"></i> Hidden for security
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Last Login:</div>
+                        <div class="info-value" id="lastLoginTime">Loading...</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Session Status:</div>
+                        <div class="info-value">
+                            <span style="color: var(--success);">
+                                <i class="fas fa-check-circle"></i> Active
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Attack Page -->
+            <div id="attackPage" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-crosshairs"></i> Attack Page</h1>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-bug"></i> Rittack Menu</h2>
+                    <p style="margin-bottom: 25px; color: var(--text-dim);">Select Target & Bug</p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Target number (e.g. +52 812xxxx)</label>
+                        <input type="text" class="form-control" placeholder="Enter target phone number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">SELECT BUG</label>
+                        <select class="form-select">
+                            <option value="">-- Select Bug Type --</option>
+                            <option value="sms">SMS Flood</option>
+                            <option value="call">Call Bombing</option>
+                            <option value="whatsapp">WhatsApp Spam</option>
+                            <option value="telegram">Telegram Spam</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-block">
+                        <i class="fas fa-paper-plane"></i> SEND BUG
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-history"></i> Recent Attacks</h2>
+                    <p style="color: var(--text-dim); margin-bottom: 20px;">No recent attacks found.</p>
+                </div>
+            </div>
+            
+            <!-- Create Account Page -->
+            <div id="createAccPage" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-user-plus"></i> Create Account</h1>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-users-cog"></i> Panel Reseller & Admin</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Username Baru</label>
+                        <input type="text" id="newUsername" class="form-control" placeholder="Enter new username" maxlength="20">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="text" id="newPassword" class="form-control" placeholder="Enter password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Expiration Days</label>
+                        <select id="expirationDays" class="form-select">
+                            <option value="7">7 Hari</option>
+                            <option value="30" selected>30 Hari</option>
+                            <option value="90">90 Hari</option>
+                            <option value="365">365 Hari</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Pilih Role</label>
+                        <select id="newUserRole" class="form-select">
+                            <option value="user">USER</option>
+                            <option value="reseller">RESELLER</option>
+                            <option value="developer">DEVELOPER</option>
+                            <option value="owner">OWNER</option>
+                        </select>
+                    </div>
+                    
+                    <button id="createAccountBtn" class="btn btn-block">
+                        <i class="fas fa-plus-circle"></i> CREATE NOW
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-list"></i> Account List</h2>
+                    
+                    <table class="accounts-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">USERNAME</th>
+                                <th style="width: 25%;">ROLE</th>
+                                <th style="width: 25%;">EXP</th>
+                                <th style="width: 20%;">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountsList">
+                            <!-- Accounts will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="role-info">
+                    <h4><i class="fas fa-info-circle"></i> Role Information</h4>
+                    <ul>
+                        <li><strong>OWNER:</strong> Semua menu bisa diakses + Create Account</li>
+                        <li><strong>DEVELOPER:</strong> Semua menu bisa diakses + Create Account</li>
+                        <li><strong>RESELLER:</strong> Semua menu bisa diakses + Create Account</li>
+                        <li><strong>USER:</strong> Semua menu bisa diakses (Create Account tidak tersedia)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Tools Page -->
+            <div id="toolsPage" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-tools"></i> Tools Menu</h1>
+                <p style="margin-bottom: 30px; color: var(--text-dim);">Advanced Security & DSINT Tools</p>
+                
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <h3>NIK Parse</h3>
+                        <p>CHECK DATA NIK</p>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fab fa-tiktok"></i>
+                        </div>
+                        <h3>Tiktok DI</h3>
+                        <p>DOWNLOAD NO WATERMARK</p>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>Spam NGL</h3>
+                        <p>ANDNYMOUS SENDER</p>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <h3>Rasuk Bot</h3>
+                        <p>TELEGRAM SPAMMER</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Thanks Page -->
+            <div id="thanksPage" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-heart"></i> Thanks To</h1>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-code"></i> Developer</h2>
+                    <div class="info-row">
+                        <div class="info-label">Main Developer:</div>
+                        <div class="info-value">@BIMA</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Owner:</div>
+                        <div class="info-value">@BIMA</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Special Thanks:</div>
+                        <div class="info-value">All Buyer (Friend)</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-copyright"></i> PEMBUAT</h2>
+                    <p style="line-height: 1.6; margin-bottom: 15px;">
+                        2025 by @bima<br>
+                        DarkMINS V1 - ALL RIGHT RESERVED
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginPage = document.getElementById('loginPage');
+        const dashboard = document.getElementById('dashboard');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const userAvatar = document.getElementById('userAvatar');
+        const userRoleBadge = document.getElementById('userRoleBadge');
+        const currentTime = document.getElementById('currentTime');
+        const currentDate = document.getElementById('currentDate');
+        const lastLoginTime = document.getElementById('lastLoginTime');
+        const validityTimer = document.getElementById('validityTimer');
+        const showPassword = document.getElementById('showPassword');
+        const createAccountBtn = document.getElementById('createAccountBtn');
+        const accountsList = document.getElementById('accountsList');
+        const createAccMenu = document.getElementById('createAccMenu');
+        
+        // Menu navigation
+        const menuItems = document.querySelectorAll('.menu-item');
+        const pageContents = document.querySelectorAll('.page-content');
+        
+        // Current user data
+        let currentUser = null;
+        
+        // Initial accounts data - HANYA BIMA01
+        let accounts = [
+            { 
+                username: "BIMA01", 
+                password: "BIMA", 
+                role: "owner", 
+                created: "2025-03-12", 
+                expires: "2026-03-12", 
+                status: "active",
+                displayName: "BIMA"
+            }
+        ];
+        
+        // Role information
+        const roleInfo = {
+            owner: { name: "OWNER", color: "owner", access: "Full Access + Create Account" },
+            developer: { name: "DEVELOPER", color: "dev", access: "Full Access + Create Account" },
+            reseller: { name: "RESELLER", color: "reseller", access: "Full Access + Create Account" },
+            user: { name: "USER", color: "user", access: "Full Access (No Create Account)" }
+        };
+        
+        // Password visibility
+        let passwordVisible = false;
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            const isLoggedIn = localStorage.getItem('darkminsLoggedIn');
+            const savedUser = localStorage.getItem('darkminsUser');
+            
+            if (isLoggedIn === 'true' && savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showDashboard();
+            }
+            
+            // Update time and date
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            
+            // Load accounts from localStorage
+            const savedAccounts = localStorage.getItem('darkminsAccounts');
+            if (savedAccounts) {
+                accounts = JSON.parse(savedAccounts);
+            } else {
+                // Save initial accounts to localStorage
+                localStorage.setItem('darkminsAccounts', JSON.stringify(accounts));
+            }
+            
+            // Initialize accounts list
+            renderAccountsList();
+            
+            // Start validity timer countdown (if logged in)
+            if (isLoggedIn === 'true') {
+                startValidityTimer();
+            }
+        });
+        
+        // Login functionality
+        loginBtn.addEventListener('click', function() {
+            const usernameInput = document.getElementById('loginUsername').value.trim();
+            const passwordInput = document.getElementById('loginPassword').value;
+            
+            if (!usernameInput || !passwordInput) {
+                alert("Please enter username and password!");
+                return;
+            }
+            
+            // Load accounts from localStorage
+            const savedAccounts = localStorage.getItem('darkminsAccounts');
+            const allAccounts = savedAccounts ? JSON.parse(savedAccounts) : accounts;
+            
+            // Check credentials
+            const foundAccount = allAccounts.find(acc => 
+                acc.username === usernameInput && acc.password === passwordInput && acc.status !== "expired"
+            );
+            
+            if (foundAccount) {
+                // Successful login
+                currentUser = {
+                    username: foundAccount.username,
+                    password: foundAccount.password,
+                    role: foundAccount.role,
+                    created: foundAccount.created,
+                    expires: foundAccount.expires,
+                    displayName: foundAccount.displayName || foundAccount.username
+                };
+                
+                localStorage.setItem('darkminsLoggedIn', 'true');
+                localStorage.setItem('darkminsUser', JSON.stringify(currentUser));
+                localStorage.setItem('lastLoginTime', new Date().toISOString());
+                
+                showDashboard();
+            } else {
+                alert("Invalid username or password!");
+            }
+        });
+        
+        // Logout functionality
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('darkminsLoggedIn');
+            showLoginPage();
+            
+            // Reset login form
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+        });
+        
+        // Show password toggle
+        showPassword.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (!currentUser) return;
+            
+            if (!passwordVisible) {
+                showPassword.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                document.getElementById('dashboardPassword').textContent = currentUser.password;
+                passwordVisible = true;
+                
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    if (passwordVisible) {
+                        showPassword.innerHTML = '<i class="fas fa-eye"></i> Show';
+                        document.getElementById('dashboardPassword').textContent = '●●●●●●●●●●';
+                        passwordVisible = false;
+                    }
+                }, 5000);
+            } else {
+                showPassword.innerHTML = '<i class="fas fa-eye"></i> Show';
+                document.getElementById('dashboardPassword').textContent = '●●●●●●●●●●';
+                passwordVisible = false;
+            }
+        });
+        
+        // Create account functionality
+        createAccountBtn.addEventListener('click', function() {
+            const newUsername = document.getElementById('newUsername').value.trim();
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const expirationDays = parseInt(document.getElementById('expirationDays').value);
+            const newUserRole = document.getElementById('newUserRole').value;
+            
+            if (!newUsername || !newPassword) {
+                alert("Please enter username and password!");
+                return;
+            }
+            
+            // Check if username already exists
+            const allAccounts = JSON.parse(localStorage.getItem('darkminsAccounts')) || accounts;
+            if (allAccounts.some(acc => acc.username.toLowerCase() === newUsername.toLowerCase())) {
+                alert("Username already exists!");
+                return;
+            }
+            
+            // Check role permissions
+            if (currentUser.role === "user") {
+                alert("USER role cannot create accounts!");
+                return;
+            }
+            
+            // Calculate expiration date
+            const createdDate = new Date();
+            const expDate = new Date();
+            expDate.setDate(expDate.getDate() + expirationDays);
+            
+            const createdFormatted = formatDate(createdDate);
+            const expFormatted = formatDate(expDate);
+            
+            // Add new account
+            const newAccount = {
+                username: newUsername,
+                password: newPassword,
+                role: newUserRole,
+                created: createdFormatted,
+                expires: expFormatted,
+                status: "active",
+                displayName: newUsername
+            };
+            
+            accounts.push(newAccount);
+            
+            // Save to localStorage for persistence
+            localStorage.setItem('darkminsAccounts', JSON.stringify(accounts));
+            
+            // Update accounts list
+            renderAccountsList();
+            
+            // Reset form
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('expirationDays').value = '30';
+            document.getElementById('newUserRole').value = 'user';
+            
+            // Show success message
+            alert(`Account created successfully!\n\nUsername: ${newUsername}\nRole: ${roleInfo[newUserRole].name}\nExpires: ${expFormatted}`);
+        });
+        
+        // Menu navigation
+        menuItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get the page to show
+                const pageToShow = this.getAttribute('data-page');
+                navigateToPage(pageToShow);
+            });
+        });
+        
+        // Functions
+        function showDashboard() {
+            loginPage.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            
+            // Update UI with current user data
+            updateUserInterface();
+            
+            // Set last login time
+            const savedLastLogin = localStorage.getItem('lastLoginTime');
+            if (savedLastLogin) {
+                lastLoginTime.textContent = new Date(savedLastLogin).toLocaleString();
+            } else {
+                lastLoginTime.textContent = new Date().toLocaleString();
+            }
+            
+            // Start validity timer
+            startValidityTimer();
+            
+            // Check menu access
+            checkMenuAccess();
+        }
+        
+        function showLoginPage() {
+            dashboard.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+            
+            // Reset password visibility
+            if (passwordVisible) {
+                showPassword.innerHTML = '<i class="fas fa-eye"></i> Show';
+                document.getElementById('dashboardPassword').textContent = '●●●●●●●●●●';
+                passwordVisible = false;
+            }
+            
+            currentUser = null;
+        }
+        
+        function updateUserInterface() {
+            if (!currentUser) return;
+            
+            // Update all username displays
+            usernameDisplay.textContent = currentUser.username;
+            document.getElementById('dashboardUsername').textContent = currentUser.username;
+            document.getElementById('infoUsername').textContent = currentUser.username;
+            
+            // Update avatar with first letter
+            userAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
+            
+            // Update role displays
+            const roleName = roleInfo[currentUser.role].name;
+            const roleColor = roleInfo[currentUser.role].color;
+            
+            userRoleBadge.textContent = roleName;
+            userRoleBadge.className = `role role-${roleColor}`;
+            
+            document.getElementById('dashboardRole').textContent = roleName;
+            document.getElementById('dashboardRole').className = `role-badge role-${roleColor}-badge`;
+            
+            document.getElementById('infoRole').textContent = roleName;
+            document.getElementById('infoRole').className = `role-badge role-${roleColor}-badge`;
+            
+            document.getElementById('systemRole').textContent = `${roleName} - ${roleInfo[currentUser.role].access}`;
+            
+            // Update expiration dates
+            document.getElementById('dashboardExpired').textContent = currentUser.expires;
+            document.getElementById('infoExpiration').textContent = currentUser.expires;
+            
+            // Update display name
+            const displayNameElement = document.querySelector('#myInfoPage .info-row:nth-child(2) .info-value');
+            if (displayNameElement) {
+                displayNameElement.textContent = currentUser.displayName || currentUser.username;
+            }
+        }
+        
+        function navigateToPage(pageId) {
+            // Remove active class from all menu items
+            menuItems.forEach(i => i.classList.remove('active'));
+            
+            // Add active class to clicked item
+            const activeItem = document.querySelector(`[data-page="${pageId}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+            
+            // Hide all pages
+            pageContents.forEach(page => page.classList.add('hidden'));
+            
+            // Show selected page
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            // If going to create account page, check access
+            if (pageId === 'createAccPage') {
+                checkCreateAccountAccess();
+            }
+        }
+        
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format time
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            // Format date
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            currentTime.textContent = timeString;
+            currentDate.textContent = dateString;
+        }
+        
+        function renderAccountsList() {
+            accountsList.innerHTML = '';
+            
+            // Load accounts from localStorage
+            const savedAccounts = localStorage.getItem('darkminsAccounts');
+            if (savedAccounts) {
+                accounts = JSON.parse(savedAccounts);
+            }
+            
+            // Filter to show only accounts created by current user or all if owner
+            let displayAccounts = accounts;
+            if (currentUser && currentUser.role !== 'owner') {
+                displayAccounts = accounts.filter(acc => acc.username === currentUser.username);
+            }
+            
+            displayAccounts.forEach(account => {
+                const row = document.createElement('tr');
+                
+                // Check if account is expired
+                const today = new Date();
+                const expDate = new Date(account.expires);
+                const isExpired = expDate < today;
+                account.status = isExpired ? "expired" : "active";
+                
+                // Determine role badge class
+                const roleClass = `role-${account.role}-badge`;
+                const roleName = roleInfo[account.role]?.name || account.role.toUpperCase();
+                
+                // Status badge
+                let statusBadge = '';
+                if (isExpired) {
+                    statusBadge = '<span class="role-badge role-expired-badge">EXPIRED</span>';
+                } else {
+                    // Calculate days left
+                    const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                    statusBadge = `<span style="color: var(--success);">${daysLeft} days left</span>`;
+                }
+                
+                row.innerHTML = `
+                    <td title="${account.username}">${account.username}</td>
+                    <td><span class="role-badge ${roleClass}">${roleName}</span></td>
+                    <td title="${account.expires}">${account.expires}</td>
+                    <td>${statusBadge}</td>
+                `;
+                
+                accountsList.appendChild(row);
+            });
+            
+            // Save updated accounts to localStorage
+            localStorage.setItem('darkminsAccounts', JSON.stringify(accounts));
+        }
+        
+        function startValidityTimer() {
+            if (!currentUser) return;
+            
+            // Set the expiration date from current user
+            const expDate = new Date(currentUser.expires);
+            
+            function updateTimer() {
+                const now = new Date();
+                const diff = expDate - now;
+                
+                if (diff <= 0) {
+                    validityTimer.textContent = "EXPIRED";
+                    validityTimer.style.color = "var(--danger)";
+                    
+                    // Mark account as expired
+                    currentUser.status = "expired";
+                    
+                    // Logout expired account
+                    setTimeout(() => {
+                        if (currentUser.status === "expired") {
+                            alert("Your account has expired!");
+                            localStorage.removeItem('darkminsLoggedIn');
+                            showLoginPage();
+                        }
+                    }, 1000);
+                    
+                    return;
+                }
+                
+                // Calculate days, hours, minutes, seconds
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                validityTimer.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                
+                // Change color if less than 7 days left
+                if (days < 7) {
+                    validityTimer.style.color = "var(--warning)";
+                }
+                if (days < 3) {
+                    validityTimer.style.color = "var(--danger)";
+                }
+            }
+            
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+        
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function checkMenuAccess() {
+            // Hide Create Account menu for USER role
+            if (currentUser && currentUser.role === "user") {
+                createAccMenu.parentElement.classList.add('hidden');
+            } else {
+                createAccMenu.parentElement.classList.remove('hidden');
+            }
+        }
+        
+        function checkCreateAccountAccess() {
+            // If user doesn't have access, redirect to dashboard
+            if (currentUser && currentUser.role === "user") {
+                alert("Access denied! USER role cannot create accounts.");
+                navigateToPage('dashboardPage');
+            }
+        }
+        
+        // Function to auto-login for testing (can be removed in production)
+        window.autoLogin = function() {
+            document.getElementById('loginUsername').value = 'BIMA01';
+            document.getElementById('loginPassword').value = 'BIMA';
+            loginBtn.click();
+        };
+    </script>
+</body>
+</html>
